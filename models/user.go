@@ -6,3 +6,11 @@ type User struct {
 	Email    string `json:"email" gorm:"unique"`
 	Password []byte `json:"-"`
 }
+
+type CustDetails struct {
+	AccID   int32  `json:"accid" gorm:"unique"`
+	AccType string `json:"acctype"`
+	BCode   string `json:"bcode"`
+	Contact int64  `json:"contact"`
+	Balance int32  `json:"balance"`
+}

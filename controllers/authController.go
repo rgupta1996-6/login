@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"../database"
-	"../models"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gofiber/fiber"
-	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"time"
+
+	"go-auth/database"
+	"go-auth/models"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const SecretKey = "secret"
@@ -27,7 +28,7 @@ func Register(c *fiber.Ctx) error {
 		Password: password,
 	}
 
-	database.DB.Create(&user)
+	 database.DB.Create(&user)
 
 	return c.JSON(user)
 }
