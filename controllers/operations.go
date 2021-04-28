@@ -10,12 +10,29 @@ import (
 )
 
 func ShowAll(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+	fmt.Println(data)
+
+	accID:= data["query"]
+	fmt.Println("Account ID:",accID)
+
+	if accID != "" {
+		custDetails := []models.CustDetails{}
+		 database.DB.Find(&custDetails, accID)
+		fmt.Println("custDetails:",custDetails)
+		return c.JSON(custDetails)
+	}else{
 
 	custDetails := []models.CustDetails{}
-
-	database.DB.Find(&custDetails)
-
+	rowsPerPage,_ := strconv.Atoi(data["rowsPerPage"])
+	page,_:= strconv.Atoi(data["page"])
+	database.DB.Limit(rowsPerPage).Offset(rowsPerPage*page).Find(&custDetails)
 	return c.JSON(custDetails)
+	}
 
 }
 
