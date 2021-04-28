@@ -30,7 +30,7 @@ func ShowAll(c *fiber.Ctx) error {
 	custDetails := []models.CustDetails{}
 	rowsPerPage,_ := strconv.Atoi(data["rowsPerPage"])
 	page,_:= strconv.Atoi(data["page"])
-	database.DB.Limit(rowsPerPage).Offset(rowsPerPage*page).Find(&custDetails)
+	database.DB.Limit(rowsPerPage).Offset(rowsPerPage*page).Order(data["orderBy"]+" "+data["order"]).Find(&custDetails)
 	return c.JSON(custDetails)
 	}
 
