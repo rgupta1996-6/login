@@ -11,6 +11,8 @@ import (
 
 func ShowAll(c *fiber.Ctx) error {
 	var data map[string]string
+	var count int64
+	var DataToBeSent models.DataToBeSent
 
 	if err := c.BodyParser(&data); err != nil {
 		return err
@@ -19,6 +21,7 @@ func ShowAll(c *fiber.Ctx) error {
 
 	accID:= data["query"]
 	fmt.Println("Account ID:",accID)
+	
 
 	if accID != "" {
 		custDetails := []models.CustDetails{}
@@ -30,8 +33,12 @@ func ShowAll(c *fiber.Ctx) error {
 	custDetails := []models.CustDetails{}
 	rowsPerPage,_ := strconv.Atoi(data["rowsPerPage"])
 	page,_:= strconv.Atoi(data["page"])
+	database.DB.Find(&custDetails).Count(&count)
 	database.DB.Limit(rowsPerPage).Offset(rowsPerPage*page).Order(data["orderBy"]+" "+data["order"]).Find(&custDetails)
-	return c.JSON(custDetails)
+	DataToBeSent.CustDetails=custDetails
+	DataToBeSent.Count=count
+
+	return c.JSON(DataToBeSent)
 	}
 
 }

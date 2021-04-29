@@ -14,3 +14,8 @@ type CustDetails struct {
 	Contact int64  `json:"contact"`
 	Balance int32  `json:"balance"`
 }
+
+type DataToBeSent struct {
+	CustDetails []CustDetails 
+	Count int64 `json:"count"`
+}
