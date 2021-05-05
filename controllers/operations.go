@@ -19,26 +19,27 @@ func ShowAll(c *fiber.Ctx) error {
 	}
 	fmt.Println(data)
 
-	accID:= data["query"]
-	fmt.Println("Account ID:",accID)
-	
+	accID := data["query"]
+	fmt.Println("Account ID:", accID)
 
 	if accID != "" {
 		custDetails := []models.CustDetails{}
-		 database.DB.Find(&custDetails, accID)
-		fmt.Println("custDetails:",custDetails)
-		return c.JSON(custDetails)
-	}else{
+		database.DB.Find(&custDetails, accID)
+		DataToBeSent.CustDetails = custDetails
+		DataToBeSent.Count = 1
+		fmt.Println("custDetails:", DataToBeSent.CustDetails)
+		return c.JSON(DataToBeSent)
+	} else {
 
-	custDetails := []models.CustDetails{}
-	rowsPerPage,_ := strconv.Atoi(data["rowsPerPage"])
-	page,_:= strconv.Atoi(data["page"])
-	database.DB.Find(&custDetails).Count(&count)
-	database.DB.Limit(rowsPerPage).Offset(rowsPerPage*page).Order(data["orderBy"]+" "+data["order"]).Find(&custDetails)
-	DataToBeSent.CustDetails=custDetails
-	DataToBeSent.Count=count
+		custDetails := []models.CustDetails{}
+		rowsPerPage, _ := strconv.Atoi(data["rowsPerPage"])
+		page, _ := strconv.Atoi(data["page"])
+		database.DB.Find(&custDetails).Count(&count)
+		database.DB.Limit(rowsPerPage).Offset(rowsPerPage * page).Order(data["orderBy"] + " " + data["order"]).Find(&custDetails)
+		DataToBeSent.CustDetails = custDetails
+		DataToBeSent.Count = count
 
-	return c.JSON(DataToBeSent)
+		return c.JSON(DataToBeSent)
 	}
 
 }
@@ -85,11 +86,18 @@ func CreditBalance(c *fiber.Ctx) error {
 	custDetails := models.CustDetails{}
 
 	database.DB.First(&custDetails, accID)
-	fmt.Println(custDetails)
 	newBal := custDetails.Balance + int32(amount)
 
-	database.DB.Exec("UPDATE cust_details SET balance=? WHERE acc_id=?", newBal, custDetails.AccID)
-	return nil
+	res := database.DB.Exec("UPDATE cust_details SET balance=? WHERE acc_id=?", newBal, custDetails.AccID)
+	if res.Error != nil {
+		return c.JSON(fiber.Map{
+			"message": "ERROR",
+		})
+	} else {
+		return c.JSON(fiber.Map{
+			"message": "SUCCESS",
+		})
+	}
 
 }
 
@@ -109,8 +117,17 @@ func DebitBalance(c *fiber.Ctx) error {
 	fmt.Println(custDetails)
 	newBal := custDetails.Balance - int32(amount)
 
-	database.DB.Exec("UPDATE cust_details SET balance=? WHERE acc_id=?", newBal, custDetails.AccID)
-	return nil
+	res:= database.DB.Exec("UPDATE cust_details SET balance=? WHERE acc_id=?", newBal, custDetails.AccID)
+	if res.Error != nil {
+		return c.JSON(fiber.Map{
+			"message": "ERROR",
+		})
+	} else {
+		return c.JSON(fiber.Map{
+			"message": "SUCCESS",
+		})
+	}
+
 
 }
 
